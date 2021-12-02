@@ -28,7 +28,7 @@ struct ClassToday {
     time: chrono::DateTime<chrono::Local>,
 }
 
-fn set_interval<F>(mut callback: F, seconds: u64) -> thread::JoinHandle<()>
+/* fn set_interval<F>(mut callback: F, seconds: u64) -> thread::JoinHandle<()>
 where
     F: FnMut() -> (),
     F: Send + 'static,
@@ -37,7 +37,7 @@ where
         thread::sleep(time::Duration::from_secs(seconds));
         callback();
     })
-}
+} */
 
 fn get_time_from_hh_mm(hh_mm: &str) -> chrono::DateTime<chrono::Local> {
     let mut hh_mm = hh_mm.split(":");
@@ -182,7 +182,8 @@ fn main() {
         fs::write(config_path, serde_json::to_string_pretty(&config).unwrap()).unwrap();
     }
 
-    set_interval(|| open_class_link(&config, &mut todays_class_launched), 1)
-        .join()
-        .unwrap();
+    loop {
+        open_class_link(&config, &mut todays_class_launched);
+        thread::sleep(time::Duration::from_secs(1));
+    }
 }
