@@ -182,10 +182,7 @@ fn main() {
         fs::write(config_path, serde_json::to_string_pretty(&config).unwrap()).unwrap();
     }
 
-    set_interval(
-        move || open_class_link(&config, &mut todays_class_launched),
-        1,
-    )
-    .join()
-    .unwrap();
+    set_interval(|| open_class_link(&config, &mut todays_class_launched), 1)
+        .join()
+        .unwrap();
 }
