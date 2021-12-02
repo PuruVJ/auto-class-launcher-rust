@@ -154,7 +154,8 @@ fn open_class_link(config: &ClassConfig, todays_class_launched: &mut HashMap<Str
             )));
         }
 
-        open(link.unwrap().as_str()).unwrap();
+        // open(link.unwrap().as_str()).unwrap();
+        println!("Mutated");
 
         todays_class_launched.insert(next_class.unwrap().name.clone(), true);
         // dbg!(next_class.unwrap().name.clone());
