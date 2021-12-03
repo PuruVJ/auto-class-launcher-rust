@@ -73,8 +73,10 @@ fn get_classes_today(
     }
 
     // Also set the todays_class_launched here
-    for class in &classes_today {
-        todays_class_launched.insert(class.name.clone(), false);
+    if todays_class_launched.into_iter().len() == 0 {
+        for class in &classes_today {
+            todays_class_launched.insert(class.name.clone(), false);
+        }
     }
 
     classes_today.sort_by(|a, b| a.time.cmp(&b.time));
@@ -138,13 +140,13 @@ fn open_class_link(config: &ClassConfig, todays_class_launched: &mut HashMap<Str
         );
     }
 
-    dbg!(todays_class_launched.clone());
     if date > launch_time
         && !todays_class_launched
             .get(&next_class.unwrap().name)
             .unwrap()
     {
         let mut link = next_class.unwrap().link.clone();
+
         if !link.is_some() {
             link = Some(String::from(format!(
                 "https://auto-class-launcher-alarm.vercel.app/?className={}&timing={}:{}",
@@ -154,12 +156,43 @@ fn open_class_link(config: &ClassConfig, todays_class_launched: &mut HashMap<Str
             )));
         }
 
-        // open(link.unwrap().as_str()).unwrap();
-        println!("Mutated");
+        open(link.unwrap().as_str()).unwrap();
 
         todays_class_launched.insert(next_class.unwrap().name.clone(), true);
-        // dbg!(next_class.unwrap().name.clone());
     }
+}
+
+fn welcome_message(config_path: &str) {
+    println!(
+        "{}",
+        "
+__          ________ _      _____ ____  __  __ ______  
+\\ \\        / /  ____| |    / ____/ __ \\|  \\/  |  ____| 
+ \\ \\  /\\  / /| |__  | |   | |   | |  | | \\  / | |__    
+  \\ \\/  \\/ / |  __| | |   | |   | |  | | |\\/| |  __|   
+   \\  /\\  /  | |____| |___| |___| |__| | |  | | |____  
+    \\/  \\/   |______|______\\_____\\____/|_|  |_|______|       
+"
+        .cyan()
+    );
+
+    println!(
+        "\n\nThis is the {} project! Opens up your class links based on your timetable 5 minutes before\n", 
+    "Auto Class Launcher".green());
+
+    println!("\nThis project works based on a config file stored in your computer. Your timetable and links are there only. ");
+
+    println!("Your config file is stored at {}", config_path.green());
+
+    println!(
+        "{}",
+        "\nPlease modify the file for your own purposes.\n".yellow()
+    );
+
+    println!(
+        "\nTo read about how to modify the file and its format, go to {}",
+        "https://github.com/PuruVJ/auto-class-launcher\n".red()
+    );
 }
 
 fn main() {
@@ -169,6 +202,8 @@ fn main() {
     let default_config: ClassConfig = serde_json::from_str(default_config_str).unwrap();
 
     let config_path = "./auto-class-launcher-timetable.json";
+
+    welcome_message(config_path);
 
     let config: ClassConfig;
 
@@ -185,6 +220,6 @@ fn main() {
 
     loop {
         open_class_link(&config, &mut todays_class_launched);
-        thread::sleep(time::Duration::from_secs(1));
+        thread::sleep(time::Duration::from_secs(10));
     }
 }
